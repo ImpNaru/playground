@@ -1,0 +1,43 @@
+<tal:main_template metal:use-macro="load:main_template.pt">
+<div metal:fill-slot='body'>
+
+    <div class="span12">
+        <h2>${len(ships)} ships for OpenTTD</h2>
+        <hr />
+        <tal:rosters repeat="roster registered_rosters">
+            <h3 id="${doc_helper.get_roster_name(repeat.roster.index)}">${doc_helper.get_roster_name(repeat.roster.index)}</h3>
+            <p>${len(roster.buy_menu_sort_order)} Ships</p>
+            <table class="table table-striped tablesorter">
+                <thead>
+                    <tr>
+                        <td class="sorter-false"><!--! empty cell --></td>
+                        <th>Ship Name</th>
+                        <th class="number">Intro Date</th>
+                        <th>Special Features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tal:build_ships_list repeat="ship ships">
+                        <tal:ship_in_roster condition="ship.id in roster.buy_menu_sort_order">
+                            <tr id="${ship.id}">
+                                <td style="vertical-align:middle; text-align:center;">
+                                    <img src="static/img/${ship.id}.png"
+                                         width="${2 * ship.buy_menu_width}" />
+                                </td>
+                                <td style="vertical-align:middle;">
+                                    <a class="table-link-dark" href="#${ship.id}">${doc_helper.unpack_name_string(ship)}</a>
+                                </td>
+                                <td class="number" style="vertical-align:middle;">${ship.intro_date}</td>
+                                <td style="vertical-align:middle;">
+                                    <!--!${', '.join(doc_helper.get_special_features_for_vehicle(consist)).capitalize()}-->
+                                </td>
+                            </tr>
+                        </tal:ship_in_roster>
+                    </tal:build_ships_list>
+                </tbody>
+            </table>
+        </tal:rosters>
+    </div>
+
+</div>
+</tal:main_template>

@@ -1,0 +1,186 @@
+<!--! fragment to be included in a wrapper -->
+<div class="container">
+    <div class="row">
+        <div class="span12">
+            <p>
+                <a href="tech_tree_table_red.html">red &amp; white</a>
+                |
+                <a href="tech_tree_table_blue.html">blue</a>
+            </p>
+            <tal:tech_tree define="tech_tree doc_helper.ships_as_tech_tree(ships)">
+
+                <tal:role_group define="intro_dates doc_helper.get_roster_by_id('default', registered_rosters).intro_dates['DEFAULT']"
+                                repeat="role_group tech_tree">
+                    <tal:descriptions switch="role_group">
+                        <div tal:case="'pax'">
+                            <h4>Passenger Vessels</h4>
+                            <ul>
+                                <li>Passengers, mail and valuables</li>
+                                <li>High-priority freight cargos like food and engineering supplies, which can be carried in high-speed mail cars and express cars</li>
+                                <li>General freight, but if a dedicated freight engine is available with similar power, the freight engine will generally be lower cost, and higher performance</li>
+                            </ul>
+                        </div>
+                        <div tal:case="'mail_utility'">
+                            <h4>Mail / Packet / Utility Ships</h4>
+                            <ul>
+                                <li>Passengers, mail and valuables</li>
+                                <li>High-priority freight cargos like food and engineering supplies, which can be carried in high-speed mail cars and express cars</li>
+                                <li>General freight, but if a dedicated freight engine is available with similar power, the freight engine will generally be lower cost, and higher performance</li>
+                            </ul>
+                        </div>
+                        <div tal:case="'dry_cargo'">
+                            <h4>Dry Cargo Vessels</h4>
+                            <p>
+                                Recommended for all general freight except cargos like food and engineering supplies, which can be carried in high-speed mail cars and express cars, which freight engines can't haul at maximum speed.
+                            </p>
+                        </div>
+                        <div tal:case="'liquid_bulk'">
+                            <h4>Liquid Bulk Tankers</h4>
+                            <ul>
+                                <li>These run at the speed of freight trains, and are suited to
+                                    <ul>
+                                        <li>short routes</li>
+                                        <li>routes which are heavily used by freight trains, which limit the maximum speed of other trains on the route</li>
+                                    </ul>
+                                </li>
+                                <li>Railcars can generally haul one additional unpowered coach, mail car or other wagon, on level routes</li>
+                                <li>Railcars can be combined as needed</li>
+                            </ul>
+                        </div>
+                        <div tal:case="'Foodstuffs Vessels'">
+                            <h4>Luxury Railcars / Multiple-Unit Trains</h4>
+                            <ul>
+                                <li>These run at express train speeds, and have more power but lower capacity than standard railcars</li>
+                                <li>Luxury railcars can be combined as needed</li>
+                            </ul>
+                        </div>
+                        <div tal:case="'specialist'">
+                            <h4>Specialist Vessels</h4>
+                            <ul>
+                                <li> high-speed diesel passenger engines with dedicated high-speed coaches</li>
+                                <li> can attach other types of cars to haul mail or freight cargos but will travel at less than maximum engine speed</li>
+                            </ul>
+                        </div>
+                        <div tal:case="'very_high_speed'">
+                            <h4>Very High-Speed Trains</h4>
+                            <ul>
+                                <li> TGV-style electric passenger trains with very high speeds</li>
+                                <li> power is distributed throughout the train
+                                    <ul>
+                                    <li> engines are relatively low power</li>
+                                    <li> every set of coaches attached to the engine adds more power</li>
+                                    </ul></li>
+                                <li> tilt bonus for higher speed through curves</li>
+                                <li> attaching other types of cars is not recommended, the train will be very underpowered and will travel at much less than maximum engine speed</li>
+                            </ul>
+                        </div>
+                        <div tal:case="'lolz'">
+                            <h4>Lolz</h4>
+                            <p>Silly trains that don't have any gameplay purpose but look nice.</p>
+                        </div>
+                    </tal:descriptions>
+                    ${role_group}
+                    <table class="tech_tree_table"
+                           style="width:100%; margin-bottom:40px;"
+                           tal:define="roles tech_tree[role_group].keys();"
+                           tal:condition="len(roles) > 0">
+                        <thead>
+                            <tr>
+                                <th style="text-align:right; padding-right: 20px;">Intro Date:</th>
+                                <th style="padding-right: 20px;" tal:repeat="intro_date intro_dates">${intro_date}</th>
+                                <td><!--! empty space cell --></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tal:roles repeat="role roles">
+                                <tal:subtypes repeat="subtype tech_tree[role_group][role]">
+                                    <tr style="border-top: solid ${'2px #ccc' if role in ['branch_freight', 'heavy_freight', 'very_heavy_freight', 'heavy_express', 'pax_railcar', 'hst', 'lolz'] else '1px #eee'};
+                                               box-shadow: inset 0 -1px #fff;
+                                               background: linear-gradient(180deg, #fff 0%, #fafafa 100%);">
+                                        <th style="text-align: right; width: 180px; padding-right: 20px;">
+                                            <!--! this string mangling will be fragile if roles or sizes change eh -->
+                                            <span tal:condition="'A' in subtype">
+                                                Small
+                                            </span>
+                                            <span tal:condition="'B' in subtype">
+                                                Small
+                                            </span>
+                                            <span tal:condition="'C' in subtype">
+                                                Medium
+                                            </span>
+                                            <span tal:condition="'D' in subtype">
+                                                Medium
+                                            </span>
+                                            <span tal:condition="'E' in subtype">
+                                                Large
+                                            </span>
+                                            <span tal:condition="'F' in subtype">
+                                                Large
+                                            </span>
+                                            <!--! currently (Jan 2021) there are no reliable strings for the role name
+                                                  the ship role is consistent, but the ship name suffix used in the buy menu may vary by ship model
+                                                  TMWFTLB to solve right now
+                                                ${doc_helper.unpack_name_suffix(role)}
+                                            -->
+                                        </th>
+                                        <td tal:repeat="gen range(1, len(intro_dates) + 1)" class="text-center" style="width: 300px;">
+                                            <tal:ship define="ship tech_tree[role_group][role][subtype][gen]">
+                                                <tal:block condition="ship is not None">
+                                                    <div id="${ship.id}" class="tech_tree_vehicle_container">
+                                                        <a href="${ship.id}.html">
+                                                            <div class="tech_tree_vehicle">
+                                                            <!--! unfinished migration from Iron Horse -->
+                                                            <!--!<div class="tech_tree_vehicle
+                                                                        ${'tech_tree_vehicle_arrow' if ship.replacement_ship is not None else None}">-->
+                                                                <span style="display:block;">
+                                                                    <!--! this is using a private var, but I am not going to lose sleep over it -->
+                                                                    ${doc_helper.unpack_name_string(ship)}
+                                                                </span>
+                                                                <img class="tech_tree_vehicle_image"
+                                                                     style="width:${ship.buy_menu_width}px"
+                                                                     src="static/img/${ship.id}.png" />
+                                                                <img class="tech_tree_vehicle_image_zoom"
+                                                                     style="width:${2 * ship.buy_menu_width}px"
+                                                                     src="static/img/${ship.id}.png" />
+                                                                <!--! unfinished migration from Iron Horse -->
+                                                                <!--!<img src="static/img/${ship.id}_${vehicle_cc}.png"
+                                                                     width="${2 * doc_helper.buy_menu_sprite_width(ship)}"
+                                                                     height="${2 * doc_helper.buy_menu_sprite_height}" />-->
+                                                                <span style="display:block; margin-top: 5px; line-height:1.3;" class="muted">
+                                                                    <small style="display:block;">
+                                                                        <!--!${base_lang_strings[ship.str_name_suffix] if ship.str_name_suffix is not None else None}-->
+                                                                    </small>
+                                                                    <br />
+                                                                    <small>${ship.default_capacity} tonnes</small>
+                                                                    <small>${ship.speed} mph</small>
+
+                                                                </span>
+                                                            </div>
+                                                            <tal:suppress replace="nothing">
+                                                            <div tal:condition="ship.replacement_ship is not None"
+                                                                 style="float:left; margin-left: 173px; margin-top: 30px;">
+                                                                <!--! this anchor overlaps the main ship anchor, but seems to work -->
+                                                                <a href="${ship.replacement_ship.id}.html">
+                                                                    <div class="muted"
+                                                                         style="width: 100px; border: solid 1px #ddd; background: #fffff3; border-radius: 4px; padding: 8px;">
+                                                                        <!--!Replaced by ${doc_helper.get_replaced_by_name(ship.replacement_ship.id, ships)}-->
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                            </tal:suppress>
+                                                        </a>
+                                                    </div>
+                                                </tal:block>
+                                            </tal:ship>
+                                        </td>
+                                        <td><!--! empty space cell --></td>
+                                    </tr>
+                                </tal:subtypes>
+                            </tal:roles>
+                        </tbody>
+                    </table>
+                </tal:role_group>
+            </tal:tech_tree>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+// -- assumes exactly 3 subtype refits, which is a sane amount; convert to repeat if more are ever needed -- //
+<tal:capacity repeat="cargo_type ship.capacities_refittable">
+    switch (FEAT_SHIPS, SELF, ${ship.id}_switch_cargo_capacity_${cargo_type}, cargo_subtype) {
+        0: return ${ship.capacities_refittable[cargo_type][0]};
+        1: return ${ship.capacities_refittable[cargo_type][1]};
+        2: return ${ship.capacities_refittable[cargo_type][2]};
+        return ${ship.capacities_refittable[cargo_type][0]};
+    }
+</tal:capacity>
+
+// -- capacity determined according to cargo class -- //
+switch (FEAT_SHIPS, SELF, ${ship.id}_switch_cargo_capacity, cargo_classes) {
+    // only special case for MAIL currently (due to use of mail_multiplier); add more here as needed
+    bitmask(CC_MAIL): ${ship.id}_switch_cargo_capacity_mail;
+    ${ship.id}_switch_cargo_capacity_default;
+}
+
+// -- handle subtype strings, used to aid players understand auto-refitting -- //
+<tal:text_type_capacity repeat="cargo_type ship.capacities_refittable">
+    // !! this doesn't show accurate units per cargo, I tested that Dec 2016, but CB 19 doesn't have the cycled cargo in scope afaict
+    // !! also text stack handling during cb 19 seems...unreliable or unsupported
+    // 0 as parameter is just to make it compile, there's probably a better way eh :P
+    <tal:text_subtype_capacity repeat="subtype_num range(3)">
+        switch (FEAT_SHIPS, SELF, ${ship.id}_switch_cargo_subtype_text_${cargo_type}_${subtype_num}, 0) {
+            0: string(STR_GENERIC_REFIT_SUBTYPE, ${ship.capacities_refittable[cargo_type][subtype_num]});
+        }
+    </tal:text_subtype_capacity>
+    switch (FEAT_SHIPS, SELF, ${ship.id}_switch_cargo_subtype_text_${cargo_type}, cargo_subtype) {
+        0: ${ship.id}_switch_cargo_subtype_text_${cargo_type}_0;
+        1: ${ship.id}_switch_cargo_subtype_text_${cargo_type}_1;
+        2: ${ship.id}_switch_cargo_subtype_text_${cargo_type}_2;
+    }
+</tal:text_type_capacity>
+
+switch (FEAT_SHIPS, SELF, ${ship.id}_switch_cargo_subtype_text, cargo_classes) {
+    // only MAIL gets special handling right now; extend others as needed
+    bitmask(CC_MAIL): ${ship.id}_switch_cargo_subtype_text_mail;
+    ${ship.id}_switch_cargo_subtype_text_default;
+}

@@ -1,0 +1,6 @@
+// -- apply the param_adjust_ship_speed parameter -- //
+switch (FEAT_SHIPS, SELF, ${ship.id}_switch_speed, param_adjust_ship_speed) {
+    0: ${ship.get_speed_adjusted_for_param(0)};
+    1: ${ship.get_speed_adjusted_for_param(1)};
+    2: ${ship.get_speed_adjusted_for_param(2)};
+}

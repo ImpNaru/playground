@@ -1,0 +1,51 @@
+<!--! this is the default template for ships that don't supply their own template -->
+
+<tal:include metal:use-macro="load: spriteset_templates.pynml" />
+
+spriteset(${ship.id}_ss_not_loaded_not_moving, "generated/graphics/${ship.id}.png") {
+  spriteset_template_empty_${ship.id}(10)
+}
+spriteset(${ship.id}_ss_not_loaded_moving, "generated/graphics/${ship.id}.png") {
+  spriteset_template_empty_${ship.id}(10)
+}
+spriteset(${ship.id}_ss_loaded_not_moving, "generated/graphics/${ship.id}.png") {
+  spriteset_template_empty_${ship.id}(10)
+}
+spriteset(${ship.id}_ss_loaded_moving, "generated/graphics/${ship.id}.png") {
+  spriteset_template_empty_${ship.id}(10)
+}
+
+spritegroup ${ship.id}_sg_moving {
+    loaded:  [
+        ${ship.id}_ss_not_loaded_moving,
+        ${ship.id}_ss_loaded_moving,
+    ];
+    loading: [ // can't be loading when moving, but we'll overlook that, it's required by nml ;)
+        ${ship.id}_ss_not_loaded_moving,
+        ${ship.id}_ss_loaded_moving,
+    ];
+}
+
+spritegroup ${ship.id}_sg_not_moving {
+    loaded:  [
+        ${ship.id}_ss_not_loaded_not_moving,
+        ${ship.id}_ss_loaded_not_moving,
+    ];
+    loading: [
+        ${ship.id}_ss_not_loaded_not_moving,
+        ${ship.id}_ss_loaded_not_moving,
+    ];
+}
+
+switch (FEAT_SHIPS, SELF, ${ship.id}_switch_graphics_ship, current_speed) {
+    0: return ${ship.id}_sg_not_moving;
+    return ${ship.id}_sg_moving;
+}
+
+<tal:include metal:use-macro="load: graphics_switches.pynml" />
+
+<tal:include metal:use-macro="load: speed_switches.pynml" />
+
+<tal:include metal:use-macro="load: capacity_switches.pynml" />
+
+<tal:include metal:use-macro="load: properties.pynml" />
